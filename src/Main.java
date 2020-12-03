@@ -14,12 +14,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.util.List;
-
 public class Main extends Application {
+
+    private Data d;
 
     @Override
     public void start(Stage stage) throws Exception {
+
+        Data d = new Data();
+        d.initPersons();
 
         Group root = new Group();
         Scene s = new Scene(root,500,400);
@@ -49,27 +52,16 @@ public class Main extends Application {
         emailSp.setCellValueFactory(new PropertyValueFactory<>("email"));
 
         //Daten in Tabelle einfügen
-        ObservableList<Person> list = getPersonList();
+        ObservableList<Person> list = d.getPersonObservableList();
         personTab.setItems(list);
-
-        //Daten sortieren
-        userSp.setSortable(true);
-        userSp.setSortType(TableColumn.SortType.ASCENDING);
 
         //Daten in Tabelle editieren
         personTab.setEditable(true);
-        userSp.setCellFactory(TextFieldTableCell.<Person>forTableColumn());
-        userSp.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Person, String>>() {
-            @Override
-            public void handle(TableColumn.CellEditEvent<Person, String> event) {
-                String neuerWert = event.getNewValue();
-                TablePosition<Person,String> pos = event.getTablePosition();
-                System.out.println("Wert: " + neuerWert + "Person: " + pos.getRow());
 
-                Person p = event.getTableView().getItems().get(pos.getRow());
-                p.setUsername(neuerWert);
-            }
-        });
+        addEventToTableColumn(1,userSp);
+        addEventToTableColumn(2,vnSp);
+        addEventToTableColumn(3,nnSp);
+        addEventToTableColumn(4,emailSp);
 
         VBox vBox = new VBox();
         vBox.getChildren().addAll(lb,personTab);
@@ -77,6 +69,22 @@ public class Main extends Application {
 
         stage.setScene(s);
         stage.show();
+    }
+
+    public void addEventToTableColumn(int columnIndex,TableColumn<Person,String> tableColumn){
+
+        tableColumn.setCellFactory(TextFieldTableCell.<Person>forTableColumn());
+        tableColumn.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Person, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Person, String> event) {
+                String neuerWert = event.getNewValue();
+                TablePosition<Person,String> pos = event.getTablePosition();
+                System.out.println("Wert: " + neuerWert + " Person: " + pos.getRow());
+
+                Person p = event.getTableView().getItems().get(pos.getRow());
+                p.setColumn(columnIndex,neuerWert);
+            }
+        });
     }
 
     public static ObservableList<Person> getPersonList(){
