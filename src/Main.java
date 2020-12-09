@@ -3,11 +3,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -15,13 +15,14 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private Data d;
+    private Data data;
+    private ObservableList<Person> personList;
 
     @Override
     public void start(Stage stage) throws Exception {
 
-        Data d = new Data();
-        d.initPersons();
+        data = new Data();
+        data.initPersons();
 
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("add..");
@@ -29,7 +30,20 @@ public class Main extends Application {
         add.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                System.out.println("click");
+                InputDialog dialog = new InputDialog();
+                dialog.show();
+
+                dialog.getSubmit().setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent actionEvent) {
+                        Person p = dialog.getPerson();
+                        data.addPerson(p);
+
+                        personList.add(p);
+
+                        dialog.hide();
+                    }
+                });
             }
         });
         menu.getItems().add(add);
@@ -64,8 +78,8 @@ public class Main extends Application {
         emailSp.setCellValueFactory(new PropertyValueFactory<>("email"));
 
         //Daten in Tabelle einfügen
-        ObservableList<Person> list = d.getPersonObservableList();
-        personTab.setItems(list);
+        personList = data.getPersonObservableList();
+        personTab.setItems(personList);
 
         //Daten in Tabelle editieren
         personTab.setEditable(true);
@@ -74,6 +88,37 @@ public class Main extends Application {
         addEventToTableColumn(2,vnSp);
         addEventToTableColumn(3,nnSp);
         addEventToTableColumn(4,emailSp);
+
+        personTab.setRowFactory( tv -> {
+            TableRow<Person> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if(event.getButton() == MouseButton.SECONDARY) {
+                    Person p = row.getItem();
+
+                    //https://tagmycode.com/snippet/5207/yes-no-cancel-dialog-in-javafx#.X9EYFLMxmUk
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Current project is modified");
+                    alert.setContentText("Delete?");
+                    ButtonType okButton = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+                    ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+                    ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    alert.getButtonTypes().setAll(okButton, noButton, cancelButton);
+                    alert.showAndWait().ifPresent(type -> {
+
+                        if (type.getButtonData() == ButtonBar.ButtonData.YES) {
+                            System.out.println("delete!");
+
+                            data.deletePerson(p);
+                            personList.remove(p);
+
+                        } else if (type.getButtonData() == ButtonBar.ButtonData.NO) {
+                            //do nothing
+                        }
+                    });
+                }
+            });
+            return row ;
+        });
 
         VBox vBox = new VBox();
         vBox.getChildren().addAll(lb,personTab);

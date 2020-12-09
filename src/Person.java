@@ -24,8 +24,16 @@ public class Person {
         this.email = new SimpleStringProperty(email);
     }
 
+    public void setPid(int pid) {
+        this.pid = pid;
+    }
+
     public int getPid() {
         return pid;
+    }
+
+    public void setSt(Statement st) {
+        this.st = st;
     }
 
     public String getUsername() {
