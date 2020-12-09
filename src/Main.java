@@ -1,15 +1,14 @@
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -24,7 +23,20 @@ public class Main extends Application {
         Data d = new Data();
         d.initPersons();
 
-        Group root = new Group();
+        MenuBar menuBar = new MenuBar();
+        Menu menu = new Menu("add..");
+        MenuItem add = new MenuItem("add item");
+        add.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                System.out.println("click");
+            }
+        });
+        menu.getItems().add(add);
+        menuBar.getMenus().add(menu);
+
+        BorderPane root = new BorderPane();
+        root.setTop(menuBar);
         Scene s = new Scene(root,500,400);
 
         Label lb = new Label("E-mail Adressen:");
@@ -65,7 +77,7 @@ public class Main extends Application {
 
         VBox vBox = new VBox();
         vBox.getChildren().addAll(lb,personTab);
-        root.getChildren().add(vBox);
+        root.setCenter(vBox);
 
         stage.setScene(s);
         stage.show();
