@@ -78,7 +78,7 @@ public class Main extends Application {
         emailSp.setCellValueFactory(new PropertyValueFactory<>("email"));
 
         //Daten in Tabelle einfügen
-        personList = data.getPersonObservableList();
+        personList = (ObservableList<Person>) data.getPersons();
         personTab.setItems(personList);
 
         //Daten in Tabelle editieren

@@ -16,7 +16,7 @@ public class Data {
     }
     private Connection con;
 
-    public List<Person> persons = new ArrayList<Person>();
+    public List<Person> persons;
 
     public Data(){
         try{
@@ -37,6 +37,7 @@ public class Data {
 
     public void initPersons(){
         try{
+            List<Person> personsN = new ArrayList<>();
             ResultSet res = con.createStatement().executeQuery("SELECT * FROM person;");
 
             while(res.next()){
@@ -48,8 +49,9 @@ public class Data {
                         res.getString(4),
                         res.getString(5)
                 );
-                persons.add(p);
+                personsN.add(p);
             }
+            persons = FXCollections.observableArrayList(personsN);
         }catch(SQLException e){
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -73,20 +75,22 @@ public class Data {
         }
     }
 
-    public ObservableList<Person> getPersonObservableList(){
-        return FXCollections.observableArrayList(persons);
+    public List<Person> getPersons() {
+        return persons;
     }
 
     public void addPerson(Person p){
         try {
-            if(con.createStatement().execute("INSERT INTO person (username,vorname,nachname,email)" +
-                    "VALUES ('" + p.getUsername() + "','" + p.getVorname() + "','" + p.getNachname() + "','" + p.getEmail() + "');")) {
+            con.createStatement().execute("INSERT INTO person (username,vorname,nachname,email)" +
+                    "VALUES ('" + p.getUsername() + "','" + p.getVorname() + "','" + p.getNachname() + "','" + p.getEmail() + "');");
 
-                ResultSet res = con.createStatement().executeQuery("SELECT MAX(pid) AS 'pid' FROM person;");
-                res.first();
-                p.setPid(res.getInt("pid"));
-                p.setSt(con.createStatement());
-            }
+            // get max pid from table --> the obne that has been inserted
+            ResultSet res = con.createStatement().executeQuery("SELECT MAX(pid) AS 'pid' FROM person;");
+
+            res.next();
+            p.setPid(res.getInt("pid"));
+            p.setSt(con.createStatement());
+
         }catch(SQLException e){
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -94,10 +98,7 @@ public class Data {
     }
     public void deletePerson(Person p){
         try {
-            if(con.createStatement().execute("DELETE FROM person WHERE pid = " + p.getPid() + ";")) {
-
-                persons.remove(p);
-            }
+            con.createStatement().execute("DELETE FROM person WHERE pid = " + p.getPid() + ";");
         }catch(SQLException e){
             System.out.println(e.getMessage());
             e.printStackTrace();
