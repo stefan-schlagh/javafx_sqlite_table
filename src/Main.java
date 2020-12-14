@@ -1,3 +1,6 @@
+import person.Person;
+import addPerson.AddPerson;
+import data.Data;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,20 +33,8 @@ public class Main extends Application {
         add.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                InputDialog dialog = new InputDialog();
+                AddPerson dialog = new AddPerson(data,personList);
                 dialog.show();
-
-                dialog.getSubmit().setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                        Person p = dialog.getPerson();
-                        data.addPerson(p);
-
-                        personList.add(p);
-
-                        dialog.hide();
-                    }
-                });
             }
         });
         menu.getItems().add(add);
@@ -136,7 +127,7 @@ public class Main extends Application {
             public void handle(TableColumn.CellEditEvent<Person, String> event) {
                 String neuerWert = event.getNewValue();
                 TablePosition<Person,String> pos = event.getTablePosition();
-                System.out.println("Wert: " + neuerWert + " Person: " + pos.getRow());
+                System.out.println("Wert: " + neuerWert + " Person.Person: " + pos.getRow());
 
                 Person p = event.getTableView().getItems().get(pos.getRow());
                 p.setColumn(columnIndex,neuerWert);

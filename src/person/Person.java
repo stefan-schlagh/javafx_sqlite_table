@@ -1,3 +1,5 @@
+package person;
+
 import javafx.beans.property.SimpleStringProperty;
 
 import java.sql.SQLException;
@@ -86,7 +88,7 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person{" +
+        return "Person.Person{" +
                 "username=" + username +
                 ", vorname=" + vorname +
                 ", nachname=" + nachname +
